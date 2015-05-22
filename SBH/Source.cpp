@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	Sequence *seq = new Sequence("AGATATATCTA", 3);
+	Sequence *seq = new Sequence("AGATGCTGTTAAGCTG", 3);
 	seq->adjacent();
 	seq->printAdjacenyMatrix();
 	seq->printOligos();
