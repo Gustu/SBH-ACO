@@ -8,5 +8,7 @@ int main()
 	seq->adjacent();
 	seq->printAdjacenyMatrix();
 	seq->printOligos();
+
+	Graph g;
 	system("pause");
 }

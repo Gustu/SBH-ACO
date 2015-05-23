@@ -28,8 +28,7 @@ void Sequence::adjacent() {
 					if (oligos[i]->val.substr(k + 1, oligoLength - (k + 1)) == oligos[j]->val.substr(0, oligoLength - (k + 1))){
 						adjacencyMatrix[i][j] = oligoLength - (k + 1);
 						break;
-					}
-						
+					}						
 				}
 			}
 		}
