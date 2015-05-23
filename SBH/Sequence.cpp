@@ -1,4 +1,4 @@
-#include "Sequence.h"
+#include "Source.h"
 
 using namespace std;
 
@@ -7,14 +7,25 @@ vector<Oligo*> Sequence::oligoFromSequence() {
 	for (unsigned int i = 0; i < seq.length() - oligoLength + 1; i++)
 	{
 		Oligo *oligo = new Oligo(seq.substr(i, oligoLength));
-		vec.push_back(oligo);
+		bool test = false;
+		for (int i = 0; i < vec.size(); i++)
+		{
+			if (vec[i]->val == oligo->val) {
+				vec[i]->baseQuantity++;
+				vec[i]->oligoClass->setOligoClass(vec[i]->baseQuantity);
+				test = true;
+				break;
+			}
+		}
+		if(!test)
+			vec.push_back(oligo);
 	}
 	oligos = vec;
 	return vec;
 }
 
 void Sequence::adjacent() {
-	int size = seq.length() - oligoLength + 1;	
+	int size = this->oligos.size();
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
@@ -40,6 +51,10 @@ void Sequence::randomizeOligosSequence() {
 	random_shuffle(oligos.begin(), oligos.end());
 }
 
+void Sequence::addErrors(double pos, double neg)
+{
+}
+
 Sequence::Sequence(string seq, int oligoLength) {
 	this->seq = seq;
 	this->oligoLength = oligoLength;
@@ -52,9 +67,17 @@ Sequence::Sequence(string seq, int oligoLength) {
 	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1);
 	oligoFromSequence();
 	randomizeOligosSequence();
+	adjacent();
 }
 
-int ** initAdjacencyMatrix(int size) {
+Sequence::Sequence(Sequence *seq) {
+	this->adjacencyMatrix = seq->adjacencyMatrix;
+	this->first = seq->first;
+	this->oligoLength = seq->oligoLength;
+	this->oligos = seq->oligos;
+}
+
+int ** Sequence::initAdjacencyMatrix(int size) {
 	int **t = new int*[size];
 	for (int i = 0; i < size; i++)
 	{

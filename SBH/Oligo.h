@@ -1,25 +1,39 @@
 #ifndef Oligo_h
 #define Oligo_h
 
-#include <string>
 
-using namespace std; 
+using namespace std;
 
-enum OligoClass
-{
-	First,
-	Second,
-	Third,
-	Fourth
+class OligoClass {
+public:
+	enum OligoEnum
+	{
+		First,
+		Second,
+		Third,
+		Fourth
+	};
+
+	OligoEnum baseOligoClass;
+
+	OligoEnum oligoClass;
+
+	OligoClass(int quantity);
+
+	OligoEnum getOligoClass(int quantity);
+
+	void setOligoClass(int quantity);
+
 };
+
 
 class Oligo {
 public:
-	OligoClass oligoClass;
+	OligoClass *oligoClass;
 
-	string val;
+	string val;	
 
-	void setOligoClass(int quantity);
+	int baseQuantity;
 
 	Oligo();
 

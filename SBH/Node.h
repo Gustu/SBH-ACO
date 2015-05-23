@@ -3,15 +3,21 @@
 
 #include "Edge.h"
 #include <vector>
+#include "Oligo.h"
 
 using namespace std;
 
 class Node
 {
 public:
-	vector<Edge *> adjacencyEdges;
+	enum Color { Green, Red }; // Green - non-visited, Red - visited
 
-	Node();
+	Color color;
+
+	vector<Edge *> adjacencyEdges;
+	Oligo *oligo;
+
+	Node(Oligo *oligo);
 	~Node();
 
 private:

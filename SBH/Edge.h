@@ -1,18 +1,23 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include "Node.h"
+class Node;
+class Oligo;
+
+#include <vector>
+#include "Oligo.h"
 
 class Edge
 {
 public:
 	Node *prev;
 	Node *next;
+	vector<Oligo *> oligos;
+	double weight;
 
 	Edge(Node *prev, Node *next);
+	Edge(Node *prev, Node *next, int weight);
 	~Edge();
-
-private:
 
 };
 

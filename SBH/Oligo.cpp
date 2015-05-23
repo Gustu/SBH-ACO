@@ -1,4 +1,4 @@
-#include "Oligo.h"
+#include "Source.h"
 
 Oligo::Oligo() {
 	val = "";
@@ -6,25 +6,36 @@ Oligo::Oligo() {
 
 Oligo::Oligo(string val) {
 	this->val = val;
-	setOligoClass(0);
+	oligoClass = new OligoClass(1);
+	baseQuantity = 1;
 }
 
 Oligo::Oligo(string val, int quantity) {
 	this->val = val;
-	setOligoClass(quantity);
+	oligoClass = new OligoClass(quantity);
+	baseQuantity = quantity;
 }
 
-void Oligo::setOligoClass(int quantity) {
+OligoClass::OligoEnum OligoClass::getOligoClass(int quantity) {
 	if (quantity == 0) {
-		oligoClass = First;
+		return First;
 	}
 	else if (quantity > 0 && quantity < 3) {
-		oligoClass = Second;
+		return Second;
 	}
 	else if (quantity > 2 && quantity < 5) {
-		oligoClass = Third;
+		return Third;
 	}
 	else {
-		oligoClass = Fourth;
+		return Fourth;
 	}
+}
+
+void OligoClass::setOligoClass(int quantity) {
+	oligoClass = getOligoClass(quantity);
+}
+
+OligoClass::OligoClass(int quantity) {
+	baseOligoClass = getOligoClass(quantity);
+	oligoClass = baseOligoClass;
 }

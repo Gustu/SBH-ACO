@@ -1,14 +1,12 @@
-#include "Sequence.h"
-
-using namespace std;
+#include "Source.h"
 
 int main()
 {
-	Sequence *seq = new Sequence("AGATGCTGTTAAGCTG", 3);
-	seq->adjacent();
-	seq->printAdjacenyMatrix();
-	seq->printOligos();
+	Sequence *seq = new Sequence("AGAAAAAA", 3);
 
-	Graph g;
+	Graph *g = new Graph(seq);
+	g->getPossibbleSequences();
+
+	g->printPossibbleSequences();
 	system("pause");
 }

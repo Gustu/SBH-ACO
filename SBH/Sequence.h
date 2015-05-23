@@ -1,11 +1,8 @@
 #ifndef Sequence_h
 #define Sequence_h
 
-#include <string>
 #include <vector>
-#include <algorithm>
 #include "Oligo.h"
-#include <iostream>
 
 using namespace std;
 
@@ -18,7 +15,10 @@ public:
 	Oligo* first;
 	vector<Oligo *> oligos;
 
+	int** initAdjacencyMatrix(int size);
 	Sequence(string seq, int oligoLength);
+
+	Sequence(Sequence *seq);
 
 	vector<Oligo*> oligoFromSequence();
 
