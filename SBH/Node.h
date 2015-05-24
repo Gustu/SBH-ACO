@@ -14,11 +14,9 @@ public:
 
 	Color color;
 
-	vector<Edge *> adjacencyEdges;
 	Oligo *oligo;
 
 	Node(Oligo *oligo);
-	~Node();
 
 private:
 

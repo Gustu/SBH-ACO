@@ -3,6 +3,7 @@
 
 #include "Node.h"
 #include "Sequence.h"
+#include <map>
 
 class Graph
 {
@@ -11,15 +12,14 @@ public:
 	Sequence *origSeq;
 
 	vector<Edge *> getAdjacencyEdges(Node *node);
+	void getPossibbleSequences(Node* node, vector<Oligo*> pSeq, map<string, int> &oligoMap);
 
 	vector< vector<Oligo *> > possibbleSequences;
 
-	void getPossibbleSequences();
-
 	void printPossibbleSequences();
-
+	void startSearching();
+	void setOligoMap(map<string, int>& oligoMap);
 	Graph(Sequence *seq);
-	~Graph();
 
 private:
 

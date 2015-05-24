@@ -11,3 +11,7 @@ Edge::Edge(Node *next, Node *prev, int weight) {
 	this->prev = prev;
 	this->weight = weight;
 }
+
+void Edge::getBetweenOligos() {
+	Oligo *prev = new Oligo();
+}

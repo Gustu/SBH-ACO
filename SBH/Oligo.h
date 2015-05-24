@@ -35,6 +35,8 @@ public:
 
 	int baseQuantity;
 
+	int quantity;
+
 	Oligo();
 
 	Oligo(string val);
