@@ -17,9 +17,7 @@ public:
 
 	Edge(Node *prev, Node *next);
 	Edge(Node *prev, Node *next, int weight);
-
-	void getBetweenOligos();
-
+	void getBetweenOligos(int oligoLength);
 };
 
 #endif
