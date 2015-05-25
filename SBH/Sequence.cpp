@@ -50,9 +50,25 @@ void Sequence::randomizeOligosSequence() {
 	first = oligos[0];
 	random_shuffle(oligos.begin(), oligos.end());
 }
-
+/* Errors in %  ex. pos = 0.2, neg = 0.2*/
 void Sequence::addErrors(double pos, double neg)
 {
+	srand(time(NULL));
+	int length = oligos.size();
+	if (length > RAND_MAX){
+		throw new exception("Not random!!");
+	}
+	int posErr = (int)(length*pos); // == floor(length*pos)
+	int negErr = (int)(length*neg);
+	// Lower random oligo class
+	for (int i = 0; i < negErr; i++){
+		int r = rand() % length;
+		OligoClass::OligoEnum oClass = oligos.at(r)->oligoClass->oligoClass;
+		if (oClass != OligoClass::OligoEnum::First){
+			oligos.at(r)->oligoClass->setOligoClass((oClass - 1) * 2); // klasa ni¿ej
+		}
+	}
+
 }
 
 Sequence::Sequence(string seq, int oligoLength) {
