@@ -2,6 +2,7 @@
 #define Sequence_h
 
 #include <vector>
+#include <ctime>
 #include "Oligo.h"
 
 using namespace std;
@@ -16,6 +17,7 @@ public:
 	vector<Oligo *> oligos;
 
 	int** initAdjacencyMatrix(int size);
+
 	Sequence(string seq, int oligoLength);
 
 	Sequence(Sequence *seq);
