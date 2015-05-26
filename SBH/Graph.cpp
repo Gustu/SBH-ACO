@@ -3,6 +3,11 @@
 Graph::Graph(Sequence *seq) {
 	this->origSeq = new Sequence(seq);
 	this->first = new Node(seq->first);
+	setOligoMap();
+	oligoMap[this->first->oligo->val]++;
+	pSeq.push_back(this->first->oligo);
+	seqLength = 1;
+
 }
 
 vector<Edge *> Graph::getAdjacencyEdges(Node *node) {
@@ -26,16 +31,36 @@ vector<Edge *> Graph::getAdjacencyEdges(Node *node) {
 	return edges;
 }
 
-void Graph::getPossibbleSequences(Node *node, vector<Oligo *> pSeq, map<string, int> &oligoMap) {
-	if (node->color != Node::Red && abs(node->oligo->oligoClass->getOligoClass(oligoMap[node->oligo->val]) - node->oligo->oligoClass->oligoClass) < 2) {
-		/*vector<Edge *> edges = getAdjacencyEdges(node);
-		
+void Graph::getPossibbleSequences(Node *node) {
+	if (node->color != Node::Red && checkLengthCondition()) {
+		vector<Edge *> edges = getAdjacencyEdges(node);
+
 		for (int i = 0; i < edges.size(); i++) {
-			getPossibbleSequences(edges[i]->next, pSeq, oligoMap);
+			if (!addOligosBetweenTwoOligoMap(edges[i])) {
+				node->color = Node::Red;
+				continue;
+			}
+			/*if (checkClassCondition() == -1) {
+				node->color = Node::Red;
+				oligoMap[pSeq[pSeq.size() - 1]->val]--;
+ 				pSeq.pop_back();
+			}*/
+			else {
+				pSeq.push_back(edges[i]->next->oligo);
+				oligoMap[edges[i]->next->oligo->val]++;
+				getPossibbleSequences(edges[i]->next);
+			}
 		}
-		possibbleSequences.push_back(origSeq->oligos);*/
+		oligoMap[pSeq[pSeq.size() - 1]->val]--;
+		pSeq.pop_back();
 	}
-	
+	else {
+		node->color = Node::Red;
+		oligoMap[pSeq[pSeq.size() - 1]->val]--;
+		pSeq.pop_back();
+		possibbleSequences.push_back(pSeq);
+	}
+
 }
 
 void Graph::printPossibbleSequences() {
@@ -43,21 +68,61 @@ void Graph::printPossibbleSequences() {
 	{
 		for each (Oligo * oligo in seq)
 		{
-			cout << oligo->val << "."<< oligo->oligoClass->oligoClass  << "->";
+			cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
 		}
 		cout << endl;
 	}
 }
 
 void Graph::startSearching() {
-	map<string, int> oligoMap;
-	setOligoMap(oligoMap);
-	vector<Oligo *> seq;
-	getPossibbleSequences(first, seq, oligoMap);
+	getPossibbleSequences(first);
 }
 
-void Graph::setOligoMap(map<string, int> &oligoMap) {
+void Graph::setOligoMap() {
 	for (Oligo*oligo : origSeq->oligos) {
 		oligoMap[oligo->val] = 0;
 	}
+}
+
+bool Graph::checkLengthCondition() {
+	if (pSeq.size() <= (origSeq->seq.length() - origSeq->oligoLength + 1)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+/*
+* -1 - skok o 2 klasy
+* 0 - zgodnosc klas +- 1
+* 1 - klasy zgodne w 100%
+*/
+int Graph::checkClassCondition() {
+	int ret = 1;
+	for (Oligo*oligo : pSeq) {
+		int differenceBetweenBaseClassAndActualClass = abs(oligo->oligoClass->getOligoClass(oligoMap[oligo->val]) - oligo->oligoClass->oligoClass);
+		if (differenceBetweenBaseClassAndActualClass >= 2) {
+			ret = -1;
+			return ret;
+		}
+		else if (differenceBetweenBaseClassAndActualClass == 1) {
+			ret = 0;
+		}
+	}
+	return ret;
+}
+
+bool Graph::addOligosBetweenTwoOligoMap(Edge *edge) {
+	edge->getBetweenOligos(origSeq->oligoLength);
+	for (Oligo*oligo : edge->oligos) {
+		int differenceBetweenBaseClassAndActualClass = abs(oligo->oligoClass->getOligoClass(oligoMap[oligo->val]+1) - oligo->oligoClass->oligoClass);
+		if (differenceBetweenBaseClassAndActualClass >= 2) {
+			return false;
+		}
+	}
+	for (Oligo*oligo : edge->oligos) {
+		oligoMap[oligo->val]++;
+	}
+	return true;
 }

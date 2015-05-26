@@ -1,7 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "Edge.h"
 #include <vector>
 #include "Oligo.h"
 

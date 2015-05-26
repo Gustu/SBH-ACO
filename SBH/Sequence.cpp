@@ -4,12 +4,10 @@ using namespace std;
 
 vector<Oligo*> Sequence::oligoFromSequence() {
 	vector<Oligo*> vec;
-	for (unsigned int i = 0; i < seq.length() - oligoLength + 1; i++)
-	{
+	for (unsigned int i = 0; i < seq.length() - oligoLength + 1; i++) {
 		Oligo *oligo = new Oligo(seq.substr(i, oligoLength));
 		bool test = false;
-		for (int i = 0; i < vec.size(); i++)
-		{
+		for (int i = 0; i < vec.size(); i++) {
 			if (vec[i]->val == oligo->val) {
 				vec[i]->baseQuantity++;
 				vec[i]->oligoClass->setOligoClass(vec[i]->baseQuantity);
@@ -17,7 +15,7 @@ vector<Oligo*> Sequence::oligoFromSequence() {
 				break;
 			}
 		}
-		if(!test)
+		if (!test)
 			vec.push_back(oligo);
 	}
 	oligos = vec;
@@ -26,33 +24,28 @@ vector<Oligo*> Sequence::oligoFromSequence() {
 
 void Sequence::adjacent() {
 	int size = this->oligos.size();
-	for (int i = 0; i < size; i++)
-	{
-		for (int j = 0; j < size; j++)
-		{
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
 			if (i == j) {
 				adjacencyMatrix[i][j] = oligoLength;
-			}
-			else {
-				for (int k = 0; k < oligoLength - 1; k++)
-				{
-					if (oligos[i]->val.substr(k + 1, oligoLength - (k + 1)) == oligos[j]->val.substr(0, oligoLength - (k + 1))){
+			} else {
+				for (int k = 0; k < oligoLength - 1; k++) {
+					if (oligos[i]->val.substr(k + 1, oligoLength - (k + 1)) == oligos[j]->val.substr(0, oligoLength - (k + 1))) {
 						adjacencyMatrix[i][j] = oligoLength - (k + 1);
 						break;
-					}						
+					}
 				}
 			}
 		}
 	}
 }
 
-void Sequence::randomizeOligosSequence() {	
+void Sequence::randomizeOligosSequence() {
 	first = oligos[0];
 	random_shuffle(oligos.begin(), oligos.end());
 }
 
-void Sequence::addErrors(double pos, double neg)
-{
+void Sequence::addErrors(double pos, double neg) {
 }
 
 Sequence::Sequence(string seq, int oligoLength) {
@@ -67,6 +60,7 @@ Sequence::Sequence(string seq, int oligoLength) {
 	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1);
 	oligoFromSequence();
 	randomizeOligosSequence();
+	//!TODO - addErrors(pos,neg)
 	adjacent();
 }
 
@@ -75,15 +69,14 @@ Sequence::Sequence(Sequence *seq) {
 	this->first = seq->first;
 	this->oligoLength = seq->oligoLength;
 	this->oligos = seq->oligos;
+	this->seq = seq->seq;
 }
 
-int ** Sequence::initAdjacencyMatrix(int size) {
+int** Sequence::initAdjacencyMatrix(int size) {
 	int **t = new int*[size];
-	for (int i = 0; i < size; i++)
-	{
+	for (int i = 0; i < size; i++) {
 		t[i] = new int[size];
-		for (int j = 0; j < size; j++)
-		{
+		for (int j = 0; j < size; j++) {
 			t[i][j] = 0;
 		}
 	}
@@ -91,11 +84,9 @@ int ** Sequence::initAdjacencyMatrix(int size) {
 	return t;
 }
 
-void Sequence::printAdjacenyMatrix(){
-	for (int i = 0; i < seq.length() - oligoLength + 1; i++)
-	{
-		for (int j = 0; j < seq.length() - oligoLength + 1; j++)
-		{
+void Sequence::printAdjacenyMatrix() {
+	for (int i = 0; i < seq.length() - oligoLength + 1; i++) {
+		for (int j = 0; j < seq.length() - oligoLength + 1; j++) {
 			cout << adjacencyMatrix[i][j] << " ";
 		}
 		cout << endl;
@@ -103,8 +94,7 @@ void Sequence::printAdjacenyMatrix(){
 }
 
 void Sequence::printOligos() {
-	for each (Oligo* oligo in oligos)
-	{
+	for each (Oligo *oligo in oligos) {
 		cout << oligo->val << " ";
 	}
 	cout << endl;

@@ -16,7 +16,9 @@ void Edge::getBetweenOligos(int oligoLength) {
 	Oligo *prev = this->prev->oligo;
 	Oligo *next = this->next->oligo;
 
-	string val = prev->val.append(next->val.substr(weight, oligoLength - weight));
+	string prevval = prev->val;
+
+	string val = prevval.append(next->val.substr(weight, oligoLength - weight));
 
 	for (int i = 1; i < val.length() - oligoLength; i++) {
 		string temp = val.substr(i, oligoLength);
