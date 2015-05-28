@@ -71,11 +71,16 @@ void Graph::printPossibbleSequences() {
 	for each (vector<Oligo *> seq in possibbleSequences)
 	{
 		string sSeq = seq[0]->val; // Clean sequence from *seq ex. ACGTTTTT
-		sSeq.resize(sSeq.size() - 1);
 		for each (Oligo * oligo in seq)
 		{
-			sSeq += oligo->val.back();
-			cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
+			int i = 0;
+			while (sSeq.substr(sSeq.size() - oligo->val.size() + i, sSeq.size()) != oligo->val.substr(0, oligo->val.size() - i) && i<oligo->val.size()) {
+				i++;
+			}
+			if (i > 0 && i < oligo->val.size()) {
+				sSeq += oligo->val.substr(oligo->val.size()-i, oligo->val.size());
+				//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
+			}			
 		}
 		cout << endl << sSeq << endl;
 	}
