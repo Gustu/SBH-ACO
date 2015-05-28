@@ -46,9 +46,11 @@ void Graph::getPossibbleSequences(Node *node) {
  				pSeq.pop_back();
 			}*/
 			else {
-				pSeq.push_back(edges[i]->next->oligo);
-				oligoMap[edges[i]->next->oligo->val]++;
-				getPossibbleSequences(edges[i]->next);
+				//if (oligoMap[edges[i]->next->oligo->val] <= seqLength){
+					pSeq.push_back(edges[i]->next->oligo);
+					oligoMap[edges[i]->next->oligo->val]++;
+					getPossibbleSequences(edges[i]->next);
+				//}
 			}
 		}
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;

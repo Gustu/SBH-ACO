@@ -68,7 +68,13 @@ void Sequence::addErrors(double pos, double neg)
 			oligos.at(r)->oligoClass->setOligoClass((oClass - 1) * 2); // klasa ni¿ej
 		}
 	}
-
+	// Add oligos
+	for (int i = 0; i < posErr; i++){
+		int r = rand() % (length * 2);
+		if (r>length){
+			oligos.push_back(new Oligo());
+		}
+	}
 }
 
 Sequence::Sequence(string seq, int oligoLength) {
