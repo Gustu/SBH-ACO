@@ -46,11 +46,11 @@ void Graph::getPossibbleSequences(Node *node) {
  				pSeq.pop_back();
 			}*/
 			else {
-				//if (oligoMap[edges[i]->next->oligo->val] <= seqLength){
+				if (oligoMap[edges[i]->next->oligo->val] <= seqLength){ // Stack Overflow barrier
 					pSeq.push_back(edges[i]->next->oligo);
 					oligoMap[edges[i]->next->oligo->val]++;
 					getPossibbleSequences(edges[i]->next);
-				//}
+				}
 			}
 		}
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;

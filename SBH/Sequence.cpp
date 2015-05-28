@@ -97,6 +97,7 @@ Sequence::Sequence(Sequence *seq) {
 	this->first = seq->first;
 	this->oligoLength = seq->oligoLength;
 	this->oligos = seq->oligos;
+	this->seq = seq->seq;
 }
 
 int ** Sequence::initAdjacencyMatrix(int size) {
