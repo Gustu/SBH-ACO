@@ -6,7 +6,7 @@ Graph::Graph(Sequence *seq) {
 	setOligoMap();
 	oligoMap[this->first->oligo->val]++;
 	pSeq.push_back(this->first->oligo);
-	seqLength = 1;
+	seqLength = origSeq->seq.size();
 
 }
 
@@ -34,7 +34,6 @@ vector<Edge *> Graph::getAdjacencyEdges(Node *node) {
 void Graph::getPossibbleSequences(Node *node) {
 	if (node->color != Node::Red && checkLengthCondition()) {
 		vector<Edge *> edges = getAdjacencyEdges(node);
-
 		for (int i = 0; i < edges.size(); i++) {
 			if (!addOligosBetweenTwoOligoMap(edges[i])) {
 				node->color = Node::Red;
@@ -43,8 +42,8 @@ void Graph::getPossibbleSequences(Node *node) {
 			/*if (checkClassCondition() == -1) {
 				node->color = Node::Red;
 				oligoMap[pSeq[pSeq.size() - 1]->val]--;
- 				pSeq.pop_back();
-			}*/
+				pSeq.pop_back();
+				}*/
 			else {
 				if (oligoMap[edges[i]->next->oligo->val] <= seqLength){ // Stack Overflow barrier
 					pSeq.push_back(edges[i]->next->oligo);
@@ -52,6 +51,9 @@ void Graph::getPossibbleSequences(Node *node) {
 					getPossibbleSequences(edges[i]->next);
 				}
 			}
+		}
+		if (seqLength - 2 == pSeq.size()){
+			possibbleSequences.push_back(pSeq);
 		}
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;
 		pSeq.pop_back();
@@ -68,11 +70,14 @@ void Graph::getPossibbleSequences(Node *node) {
 void Graph::printPossibbleSequences() {
 	for each (vector<Oligo *> seq in possibbleSequences)
 	{
+		string sSeq = seq[0]->val; // Clean sequence from *seq ex. ACGTTTTT
+		sSeq.resize(sSeq.size() - 1);
 		for each (Oligo * oligo in seq)
 		{
+			sSeq += oligo->val.back();
 			cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
 		}
-		cout << endl;
+		cout << endl << sSeq << endl;
 	}
 }
 
@@ -118,7 +123,7 @@ int Graph::checkClassCondition() {
 bool Graph::addOligosBetweenTwoOligoMap(Edge *edge) {
 	edge->getBetweenOligos(origSeq->oligoLength);
 	for (Oligo*oligo : edge->oligos) {
-		int differenceBetweenBaseClassAndActualClass = abs(oligo->oligoClass->getOligoClass(oligoMap[oligo->val]+1) - oligo->oligoClass->oligoClass);
+		int differenceBetweenBaseClassAndActualClass = abs(oligo->oligoClass->getOligoClass(oligoMap[oligo->val] + 1) - oligo->oligoClass->oligoClass);
 		if (differenceBetweenBaseClassAndActualClass >= 2) {
 			return false;
 		}
