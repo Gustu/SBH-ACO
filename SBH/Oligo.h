@@ -31,7 +31,7 @@ class Oligo {
 public:
 	OligoClass *oligoClass;
 
-	string val;	
+	string val;
 
 	int baseQuantity;
 
@@ -42,6 +42,14 @@ public:
 	Oligo(string val);
 
 	Oligo(string val, int quantity);
+
+	int operator==(const Oligo &o);
+
+	int valToInt();
+
+private:
+
+	
 };
 
 #endif

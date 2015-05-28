@@ -56,7 +56,7 @@ void Sequence::addErrors(double pos, double neg)
 	srand(time(NULL));
 	int length = oligos.size();
 	if (length > RAND_MAX){
-		throw new exception("Not random!!");
+		cout << "W001: Length higher than RAND_MAX. Errors might be less random." << endl;
 	}
 	int posErr = (int)(length*pos); // == floor(length*pos)
 	int negErr = (int)(length*neg);
@@ -65,13 +65,16 @@ void Sequence::addErrors(double pos, double neg)
 		int r = rand() % length;
 		OligoClass::OligoEnum oClass = oligos.at(r)->oligoClass->oligoClass;
 		if (oClass != OligoClass::OligoEnum::First){
-			oligos.at(r)->oligoClass->setOligoClass((oClass - 1) * 2); // klasa ni¿ej
+			oligos.at(r)->oligoClass->setOligoClass((oClass - 1) * 2); // lower class
 		}
 	}
 	// Add oligos
+	int iOligoSize = pow(4, oligoLength);
+	vector<int> tPossibleOligos = createOligoMatrix();
+	random_shuffle(tPossibleOligos.begin(), tPossibleOligos.end());
 	for (int i = 0; i < posErr; i++){
-		int r = rand() % (length * 2);
-		if (r>length){
+		int r = rand() % (length * 2); 
+		if (r>length){ //if true generate new oligo else change random oligo to class higher
 			oligos.push_back(new Oligo());
 		}
 	}
@@ -131,4 +134,17 @@ void Sequence::printOligos() {
 		cout << oligo->val << " ";
 	}
 	cout << endl;
+}
+
+vector<int> Sequence::createOligoMatrix(){
+	int iSize = pow(4, oligoLength);
+	//A=0,C=1,G=2,T=3
+	vector<int> tMatrix;
+	for (int i = 0; i < iSize; i++){
+		tMatrix.push_back(i);
+	}
+	for each(Oligo* oligo in oligos){
+		tMatrix[oligo->valToInt()] = -1;
+	}
+	return tMatrix;
 }

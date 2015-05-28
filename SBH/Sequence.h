@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <ctime>
+#include <cmath>
 #include "Oligo.h"
 
 using namespace std;
@@ -36,8 +37,10 @@ public:
 
 	friend int ** initAdjacencyMatrix(int size);
 
-private:
 
+
+private:
+	vector<int> createOligoMatrix();
 };
 
 #endif
