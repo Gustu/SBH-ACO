@@ -5,6 +5,7 @@
 #include "Sequence.h"
 #include <map>
 #include "Edge.h"
+#include <list>
 
 class Graph
 {
@@ -15,6 +16,7 @@ public:
 	vector<Oligo *> pSeq;
 	map<string, int> oligoMap;
 	int seqLength;
+	list<string> result;
 
 	vector<Edge *> getAdjacencyEdges(Node *node);
 	void getPossibbleSequences(Node* node);

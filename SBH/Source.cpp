@@ -2,7 +2,7 @@
 
 int main()
 {
-	Sequence *seq = new Sequence("ATTCGATC", 5);
+	Sequence *seq = new Sequence("ACGTTTA", 3);
 
 	Graph *g = new Graph(seq);
 	g->startSearching();

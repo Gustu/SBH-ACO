@@ -82,7 +82,12 @@ void Graph::printPossibbleSequences() {
 				//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
 			}			
 		}
-		cout << endl << sSeq << endl;
+		//cout << endl << sSeq << endl;
+		result.push_back(sSeq);
+	}
+	result.unique();
+	for (string r : result) {
+		cout << r << endl;
 	}
 }
 
