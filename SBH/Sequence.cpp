@@ -144,7 +144,7 @@ vector<int> Sequence::createOligoMatrix(){
 		tMatrix.push_back(i);
 	}
 	for each(Oligo* oligo in oligos){
-		tMatrix[oligo->valToInt()] = -1;
+		tMatrix[oligo->valToLong()] = -1;
 	}
 	return tMatrix;
 }

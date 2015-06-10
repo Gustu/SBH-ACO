@@ -2,9 +2,10 @@
 
 int main()
 {
-	Sequence *seq = new Sequence("ACGTTTA", 3);
+	Sequence *seq = new Sequence("CATGTTTCCACTTACAGATCCTTCAAAAAGAGTGTTTCAAAACTGCTCTATGAAAAGGAATGTTCAACTCTGTGAGTTAAATAAAAGCATCAAAAAAAAGTTTCTGAGAATGCTTCTGTC", 8);
 
 	Graph *g = new Graph(seq);
+
 	g->startSearching();
 
 	g->printPossibbleSequences();

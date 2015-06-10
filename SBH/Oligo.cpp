@@ -44,10 +44,10 @@ int Oligo::operator==(const Oligo &o){
 	return val == o.val;
 }
 
-int Oligo::valToInt(){
-	int iValue = 0;
+long long Oligo::valToLong(){
+	long long iValue = 0;
 	//A=0,C=1,G=2,T=3
-	for (int i = 0; i < val.size();i++){
+	for (int i = 0; i < val.size(); i++){
 		switch (val[i]){
 		case 'A':
 			iValue += pow(4, i) * 0;
@@ -63,5 +63,38 @@ int Oligo::valToInt(){
 			break;
 		}
 	}
+	if (val[val.size() - 1] == 'A'){
+		iValue = iValue*(-1);
+	}
 	return iValue;
+}
+
+string Oligo::LongToVal(long long iVal){
+	string sVal = "";
+	bool endingA = (iVal<0) ? true : false;
+	while (iVal > 0){
+		long long sym = iVal%4;
+		switch (sym){
+		case 0:
+			sVal += 'A';
+			break;
+		case 1:
+			sVal += 'C';
+			break;
+		case 2:
+			sVal += 'G';
+			break;
+		case 3:
+			sVal += 'T';
+			break;
+		}
+		if (iVal < 4){
+			if (endingA){
+				sVal += "A";
+				break;
+			}
+		}
+		iVal = iVal / 4;		
+	}
+	return sVal;
 }

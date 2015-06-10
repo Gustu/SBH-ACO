@@ -21,7 +21,7 @@ vector<Edge *> Graph::getAdjacencyEdges(Node *node) {
 
 	for (int i = 0; i < origSeq->oligos.size(); i++)
 	{
-		if (origSeq->adjacencyMatrix[j][i] > 0 && origSeq->adjacencyMatrix[j][i] < origSeq->oligoLength){
+		if (origSeq->adjacencyMatrix[j][i] > origSeq->oligoLength - 2 && origSeq->adjacencyMatrix[j][i] < origSeq->oligoLength){
 			Node *prev = node;
 			Node *next = new Node(origSeq->oligos[i]);
 			edges.push_back(new Edge(prev, next, origSeq->adjacencyMatrix[j][i]));
@@ -52,7 +52,7 @@ void Graph::getPossibbleSequences(Node *node) {
 				}
 			}
 		}
-		if (seqLength - 2 == pSeq.size()){
+		if (seqLength - origSeq->oligoLength + 1 == pSeq.size()){
 			possibbleSequences.push_back(pSeq);
 		}
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;
@@ -87,7 +87,7 @@ void Graph::printPossibbleSequences() {
 	}
 	result.unique();
 	for (string r : result) {
-		cout << r << endl;
+			cout << r << endl;
 	}
 }
 
