@@ -45,9 +45,9 @@ public:
 
 	int operator==(const Oligo &o);
 
-	long long valToLong();
+	int valToInt();
 
-	string LongToVal(long long iVal);
+	string IntToVal(int iVal);
 
 private:
 

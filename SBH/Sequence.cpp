@@ -17,7 +17,7 @@ vector<Oligo*> Sequence::oligoFromSequence() {
 				break;
 			}
 		}
-		if(!test)
+		if (!test)
 			vec.push_back(oligo);
 	}
 	oligos = vec;
@@ -39,14 +39,14 @@ void Sequence::adjacent() {
 					if (oligos[i]->val.substr(k + 1, oligoLength - (k + 1)) == oligos[j]->val.substr(0, oligoLength - (k + 1))){
 						adjacencyMatrix[i][j] = oligoLength - (k + 1);
 						break;
-					}						
+					}
 				}
 			}
 		}
 	}
 }
 
-void Sequence::randomizeOligosSequence() {	
+void Sequence::randomizeOligosSequence() {
 	first = oligos[0];
 	random_shuffle(oligos.begin(), oligos.end());
 }
@@ -73,9 +73,22 @@ void Sequence::addErrors(double pos, double neg)
 	vector<int> tPossibleOligos = createOligoMatrix();
 	random_shuffle(tPossibleOligos.begin(), tPossibleOligos.end());
 	for (int i = 0; i < posErr; i++){
-		int r = rand() % (length * 2); 
+		int r = rand() % (length * 2);
 		if (r>length){ //if true generate new oligo else change random oligo to class higher
-			oligos.push_back(new Oligo());
+			for (int j = 0; j < tPossibleOligos.size(); j++){
+				if (tPossibleOligos[j] >= 0){
+					oligos.push_back(new Oligo(first->IntToVal(tPossibleOligos[j])));
+					break;
+				}
+			}
+		}
+		else{
+			for (int j = 0; j < oligos.size(); j++){
+				if (oligos[j]->oligoClass->oligoClass != 3){
+					oligos[j]->oligoClass->oligoClass = (OligoClass::OligoEnum)(oligos[j]->oligoClass->oligoClass + 1);
+					break;
+				}
+			}
 		}
 	}
 }
@@ -89,9 +102,12 @@ Sequence::Sequence(string seq, int oligoLength) {
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
-	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1);
+
+	
 	oligoFromSequence();
 	randomizeOligosSequence();
+	addErrors(0.1, 0.1);
+	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1);
 	adjacent();
 }
 
@@ -144,7 +160,7 @@ vector<int> Sequence::createOligoMatrix(){
 		tMatrix.push_back(i);
 	}
 	for each(Oligo* oligo in oligos){
-		tMatrix[oligo->valToLong()] = -1;
+		tMatrix[abs(oligo->valToInt())] = -1;
 	}
 	return tMatrix;
 }
