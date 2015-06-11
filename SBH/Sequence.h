@@ -14,6 +14,7 @@ public:
 	string seq;
 	int oligoLength;
 	int **adjacencyMatrix;
+	int errorOligos;
 	Oligo* first;
 	vector<Oligo *> oligos;
 

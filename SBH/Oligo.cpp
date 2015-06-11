@@ -72,7 +72,7 @@ int Oligo::valToInt(){
 string Oligo::IntToVal(int iVal){
 	string sVal = "";
 	bool endingA = (iVal<0) ? true : false;
-	while (iVal > 0){
+	for (int i = 0; i < val.size();i++){
 		int sym = iVal%4;
 		switch (sym){
 		case 0:

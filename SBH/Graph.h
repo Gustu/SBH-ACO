@@ -17,13 +17,15 @@ public:
 	map<string, int> oligoMap;
 	int seqLength;
 	list<string> result;
+	int test;
+	int stack;
 
 	vector<Edge *> getAdjacencyEdges(Node *node);
-	void getPossibbleSequences(Node* node);
+	void getPossibbleSequences(Node* node, int errors, int weigth);
 	void printPossibbleSequences();
 	void startSearching();
 	void setOligoMap();
-	bool checkLengthCondition();
+	bool checkLengthCondition(int weigth);
 	int checkClassCondition();
 	bool addOligosBetweenTwoOligoMap(Edge* edge);
 	Graph(Sequence *seq);

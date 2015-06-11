@@ -62,11 +62,16 @@ void Sequence::addErrors(double pos, double neg)
 	int negErr = (int)(length*neg);
 	// Lower random oligo class
 	for (int i = 0; i < negErr; i++){
-		int r = rand() % length;
+		int r = rand() % oligos.size();
 		OligoClass::OligoEnum oClass = oligos.at(r)->oligoClass->oligoClass;
 		if (oClass != OligoClass::OligoEnum::First){
-			oligos.at(r)->oligoClass->setOligoClass((oClass - 1) * 2); // lower class
+			oligos.erase(oligos.begin() + r);
+			errorOligos--;
 		}
+		else{
+			i--;
+		}
+		
 	}
 	// Add oligos
 	int iOligoSize = pow(4, oligoLength);
@@ -78,14 +83,18 @@ void Sequence::addErrors(double pos, double neg)
 			for (int j = 0; j < tPossibleOligos.size(); j++){
 				if (tPossibleOligos[j] >= 0){
 					oligos.push_back(new Oligo(first->IntToVal(tPossibleOligos[j])));
+					errorOligos++;
+					tPossibleOligos[j] = -1;
 					break;
 				}
 			}
 		}
 		else{
+			random_shuffle(oligos.begin(), oligos.end());
 			for (int j = 0; j < oligos.size(); j++){
 				if (oligos[j]->oligoClass->oligoClass != 3){
 					oligos[j]->oligoClass->oligoClass = (OligoClass::OligoEnum)(oligos[j]->oligoClass->oligoClass + 1);
+					oligos[j]->oligoClass->baseOligoClass = oligos[j]->oligoClass->oligoClass;
 					break;
 				}
 			}
@@ -97,6 +106,7 @@ Sequence::Sequence(string seq, int oligoLength) {
 	this->seq = seq;
 	this->oligoLength = oligoLength;
 	int oligoNumber = (seq.length() - oligoLength + 1);
+	errorOligos = 0;
 	if (oligoNumber < 1) {
 		cout << "Error: bad oligo length" << endl;
 		system("pause");
@@ -106,8 +116,8 @@ Sequence::Sequence(string seq, int oligoLength) {
 	
 	oligoFromSequence();
 	randomizeOligosSequence();
-	addErrors(0.1, 0.1);
-	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1);
+	//addErrors(0.1, 0.1);
+	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1 + errorOligos);
 	adjacent();
 }
 
