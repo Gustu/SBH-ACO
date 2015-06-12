@@ -7,7 +7,30 @@ Graph::Graph(Sequence *seq) {
 	oligoMap[this->first->oligo->val]++;
 	pSeq.push_back(this->first->oligo);
 	seqLength = origSeq->seq.size();
+	overlap = 0;
+}
 
+int Graph::nucleotidesLeft() {
+	int left = 0;
+	map<string, int> temp;
+	typedef map<string, int>::iterator it_type;
+	
+	for (Oligo * oligo : origSeq->oligos) {
+		temp[oligo->val]++;
+	}
+	for (it_type iterator = temp.begin(); iterator != temp.end(); ++iterator) {
+		int val = iterator->second;
+		if (val > 0 && val < 3 && (1 - oligoMap[iterator->first]) > 0) {
+			left++;
+		}
+		else if (val > 2 && val < 5 && (3 - oligoMap[iterator->first]) > 0) {
+			left += 3 - oligoMap[iterator->first];
+		}
+		else if (val >= 5 && (3 - oligoMap[iterator->first]) > 0){
+			left += 5 - oligoMap[iterator->first];
+		}
+	}
+	return left;
 }
 
 vector<Edge *> Graph::getAdjacencyEdges(Node *node) {
@@ -32,10 +55,12 @@ vector<Edge *> Graph::getAdjacencyEdges(Node *node) {
 }
 
 void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
-	if (node->color != Node::Red && checkLengthCondition(weigth)) {
+	if (node->color != Node::Red && checkLengthCondition(weigth) && (errors <= bestErrorResult || bestErrorResult == -1)) {
 		vector<Edge *> edges = getAdjacencyEdges(node);
+		
 
 		for (int i = 0; i < edges.size(); i++) {
+
 			weigth += (origSeq->oligoLength - edges[i]->weight);
 			if (!addOligosBetweenTwoOligoMap(edges[i])) {
 				node->color = Node::Red;
@@ -55,15 +80,29 @@ void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
 					pSeq.push_back(edges[i]->next->oligo);
 					oligoMap[edges[i]->next->oligo->val]++;
 					if (checkClassCondition() == 0) errors++;
+					errors += edges[i]->errors;
 					stack++;
+					
+					overlap += edges[i]->weight;
 					getPossibbleSequences(edges[i]->next, errors, weigth);
+					overlap -= edges[i]->weight;
 				}
 			}
 			weigth -= (origSeq->oligoLength - edges[i]->weight);
 		}
-		if (weigth == origSeq->seq.size()){
-			cout << test++ << ":" << errors << "=" << weigth << endl;
-			possibbleSequences.push_back(pSeq);
+		if (pSeq.size()*origSeq->oligoLength - overlap == origSeq->seq.size()){
+			if (bestErrorResult == -1) {
+				bestErrorResult = errors;
+			}
+			else {
+				if (errors <= bestErrorResult) {
+					//cout << test++ << ":" << errors << "=" << weigth << endl;
+					bestErrorResult = errors;
+					possibbleSequences.push_back(pSeq);
+					errorsList.push_back(errors);
+				}
+			}
+			
 		}
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;
 		pSeq.pop_back();
@@ -72,9 +111,10 @@ void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
 		node->color = Node::Red;
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;
 		pSeq.pop_back();
-		if (weigth == origSeq->seq.size()){
+		if (pSeq.size()*origSeq->oligoLength - overlap == origSeq->seq.size()){
 			possibbleSequences.push_back(pSeq);
-			cout << test++ << ":" << errors << "=" << weigth << endl;
+			errorsList.push_back(errors);
+			//cout << test++ << ":" << errors << "=" << pSeq.size()*origSeq->oligoLength - overlap  << endl;
 		}
 	}
 
@@ -82,22 +122,27 @@ void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
 
 void Graph::printPossibbleSequences() {
 	cout << "Stack::" << stack << endl;
+	int c = 0;
 	for each (vector<Oligo *> seq in possibbleSequences)
 	{
-		string sSeq = seq[0]->val; // Clean sequence from *seq ex. ACGTTTTT
-		for each (Oligo * oligo in seq)
-		{
-			int i = 0;
-			while (sSeq.substr(sSeq.size() - oligo->val.size() + i, sSeq.size()) != oligo->val.substr(0, oligo->val.size() - i) && i<oligo->val.size()) {
-				i++;
+		if (errorsList[c] == errorsList[errorsList.size() - 1]) {
+			string sSeq = seq[0]->val; // Clean sequence from *seq ex. ACGTTTTT
+			for each (Oligo * oligo in seq)
+			{
+				int i = 0;
+				while (sSeq.substr(sSeq.size() - oligo->val.size() + i, sSeq.size()) != oligo->val.substr(0, oligo->val.size() - i) && i<oligo->val.size()) {
+					i++;
+				}
+				if (i > 0 && i < oligo->val.size()) {
+					sSeq += oligo->val.substr(oligo->val.size() - i, oligo->val.size());
+					//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
+				}
 			}
-			if (i > 0 && i < oligo->val.size()) {
-				sSeq += oligo->val.substr(oligo->val.size() - i, oligo->val.size());
-				//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
-			}
+			//cout << endl << sSeq << endl;
+			result.push_back(sSeq);
 		}
-		//cout << endl << sSeq << endl;
-		result.push_back(sSeq);
+		c++;
+		
 	}
 	result.unique();
 	int num = 0;
@@ -109,7 +154,10 @@ void Graph::printPossibbleSequences() {
 					same++;
 				}
 			}
-			cout << num++ << ":" << same << "/" << r.size() << "[" << (int)((same * 100) / r.size()) << "%]\t" << r << endl;
+			cout << "#####" << endl;
+			cout << num++ << ":" << same << "/" << r.size() << "[" << (int)((same * 100) / r.size()) << "%]\t" << endl;
+			cout << r << endl;
+			cout << "#####" << endl;
 		}
 	}
 }
@@ -125,7 +173,7 @@ void Graph::setOligoMap() {
 }
 
 bool Graph::checkLengthCondition(int weigth) {
-	if (weigth <= origSeq->seq.size()){
+	if (weigth <= origSeq->seq.size() && origSeq->seq.size() >= pSeq.size()*origSeq->oligoLength - overlap){
 		return true;
 	}
 	else{
@@ -165,14 +213,19 @@ int Graph::checkClassCondition() {
 
 bool Graph::addOligosBetweenTwoOligoMap(Edge *edge) {
 	edge->getBetweenOligos(origSeq->oligoLength);
+	int temp = 0;
 	for (Oligo*oligo : edge->oligos) {
-		int differenceBetweenBaseClassAndActualClass = abs(oligo->oligoClass->getOligoClass(oligoMap[oligo->val] + 1) - oligo->oligoClass->oligoClass);
-		if (differenceBetweenBaseClassAndActualClass >= 2) {
+		int differenceBetweenBaseClassAndActualClass = oligo->oligoClass->getOligoClass(oligoMap[oligo->val] + 1) - oligo->oligoClass->oligoClass;
+		if (differenceBetweenBaseClassAndActualClass > 0) {
+			temp++;
+		}
+		if (abs(differenceBetweenBaseClassAndActualClass) >= 2) {
 			return false;
 		}
 	}
 	for (Oligo*oligo : edge->oligos) {
 		oligoMap[oligo->val]++;
 	}
+	edge->errors = temp;
 	return true;
 }

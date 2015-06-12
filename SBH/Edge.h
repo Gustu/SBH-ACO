@@ -14,6 +14,7 @@ public:
 	Node *next;
 	vector<Oligo *> oligos;
 	double weight;
+	int errors;
 
 	Edge(Node *prev, Node *next);
 	Edge(Node *prev, Node *next, int weight);

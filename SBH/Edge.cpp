@@ -4,12 +4,14 @@ Edge::Edge(Node *prev, Node *next) {
 	this->next = next;
 	this->prev = prev;
 	this->weight = 0;
+	this->errors = 0;
 }
 
 Edge::Edge(Node *prev, Node *next, int weight) { 
 	this->next = next;
 	this->prev = prev;
 	this->weight = weight;
+	this->errors = 0;
 }
 
 void Edge::getBetweenOligos(int oligoLength) {
