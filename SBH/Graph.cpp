@@ -41,17 +41,19 @@ void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
 				node->color = Node::Red;
 				weigth -= (origSeq->oligoLength - edges[i]->weight);
 				continue;
-			}else
-			if (checkClassCondition() == -1) {
-				node->color = Node::Red;
+			}
+			//else
+			//if (checkClassCondition() == -1) {
+				//node->color = Node::Red;
 				//oligoMap[pSeq[pSeq.size() - 1]->val]--;
 				//pSeq.pop_back();
-				continue;
-				}
-			else {
+				//continue;
+			//}
+			else
+			{
 				if (oligoMap[edges[i]->next->oligo->val] <= seqLength){ // Stack Overflow barrier
 					pSeq.push_back(edges[i]->next->oligo);
-					oligoMap[edges[i]->next->oligo->val]++;	
+					oligoMap[edges[i]->next->oligo->val]++;
 					if (checkClassCondition() == 0) errors++;
 					stack++;
 					getPossibbleSequences(edges[i]->next, errors, weigth);
@@ -59,7 +61,7 @@ void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
 			}
 			weigth -= (origSeq->oligoLength - edges[i]->weight);
 		}
-		if (seqLength - origSeq->oligoLength + 1 == pSeq.size()){
+		if (weigth == origSeq->seq.size()){
 			cout << test++ << ":" << errors << "=" << weigth << endl;
 			possibbleSequences.push_back(pSeq);
 		}
@@ -70,10 +72,10 @@ void Graph::getPossibbleSequences(Node *node, int errors, int weigth) {
 		node->color = Node::Red;
 		oligoMap[pSeq[pSeq.size() - 1]->val]--;
 		pSeq.pop_back();
-		//if (weigth == origSeq->seq.size()){
+		if (weigth == origSeq->seq.size()){
 			possibbleSequences.push_back(pSeq);
 			cout << test++ << ":" << errors << "=" << weigth << endl;
-		//}
+		}
 	}
 
 }
@@ -90,9 +92,9 @@ void Graph::printPossibbleSequences() {
 				i++;
 			}
 			if (i > 0 && i < oligo->val.size()) {
-				sSeq += oligo->val.substr(oligo->val.size()-i, oligo->val.size());
+				sSeq += oligo->val.substr(oligo->val.size() - i, oligo->val.size());
 				//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
-			}			
+			}
 		}
 		//cout << endl << sSeq << endl;
 		result.push_back(sSeq);
@@ -113,7 +115,7 @@ void Graph::printPossibbleSequences() {
 }
 
 void Graph::startSearching() {
-	getPossibbleSequences(first,0,origSeq->oligoLength);
+	getPossibbleSequences(first, 0, origSeq->oligoLength);
 }
 
 void Graph::setOligoMap() {
@@ -131,10 +133,10 @@ bool Graph::checkLengthCondition(int weigth) {
 	}
 	/*if (pSeq.size() <= (origSeq->seq.length() - origSeq->oligoLength + 1)) {
 		return true;
-	}
-	else {
+		}
+		else {
 		return false;
-	}*/
+		}*/
 }
 
 /*

@@ -53,6 +53,7 @@ void Sequence::randomizeOligosSequence() {
 /* Errors in %  ex. pos = 0.2, neg = 0.2*/
 void Sequence::addErrors(double pos, double neg)
 {
+	if (pos == 0 && neg == 0) return;
 	srand(time(NULL));
 	int length = oligos.size();
 	if (length > RAND_MAX){
@@ -65,8 +66,7 @@ void Sequence::addErrors(double pos, double neg)
 		int r = rand() % oligos.size();
 		OligoClass::OligoEnum oClass = oligos.at(r)->oligoClass->oligoClass;
 		if (oClass != OligoClass::OligoEnum::First){
-			oligos.erase(oligos.begin() + r);
-			errorOligos--;
+			oligos.at(r)->oligoClass->setOligoClass((oClass - 1) * 2);
 		}
 		else{
 			i--;
@@ -116,7 +116,7 @@ Sequence::Sequence(string seq, int oligoLength) {
 	
 	oligoFromSequence();
 	randomizeOligosSequence();
-	//addErrors(0.1, 0.1);
+	addErrors(0.2, 0.2);
 	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1 + errorOligos);
 	adjacent();
 }
