@@ -7,12 +7,11 @@
 #include "Edge.h"
 #include <list>
 
-class Graph
-{
+class Graph {
 public:
 	Node *first;
 	Sequence *origSeq;
-	vector< vector<Oligo *> > possibbleSequences;
+	vector<vector<Oligo *>> possibbleSequences;
 	vector<int> errorsList;
 	vector<Oligo *> pSeq;
 	map<string, int> oligoMap;
@@ -24,13 +23,13 @@ public:
 	int overlap;
 
 	vector<Edge *> getAdjacencyEdges(Node *node);
-	void getPossibbleSequences(Node* node, int errors, int weigth);
+	void getPossibbleSequences(Node *node, int errors, int weigth);
 	void printPossibbleSequences();
 	void startSearching();
 	void setOligoMap();
 	bool checkLengthCondition(int weigth);
 	int checkClassCondition();
-	bool addOligosBetweenTwoOligoMap(Edge* edge);
+	bool addOligosBetweenTwoOligoMap(Edge *edge);
 	Graph(Sequence *seq);
 	int nucleotidesLeft();
 
