@@ -69,18 +69,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ACO.cpp" />
+    <ClCompile Include="Ant.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Oligo.cpp" />
+    <ClCompile Include="Roulette.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ACO.h" />
+    <ClInclude Include="Ant.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Oligo.h" />
+    <ClInclude Include="Roulette.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Source.h" />
   </ItemGroup>
