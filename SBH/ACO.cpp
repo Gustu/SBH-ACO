@@ -4,18 +4,19 @@ double Determinant(double **a, int n);
 
 void ACO::initWeightOptions() {
 	double temp[5][3] = {
-				{ 1, 0, 0 },
-				{ 2.0 / 3.0, 1.0 / 3.0, 0.0 },
-				{ 1.0 / 3.0, 2.0 / 3.0, 0 },
-				{ 0.0, 1.0, 0.0 },
-				{ 0.0, 0.0, 1.0 }
-		};
+		{ 1, 0, 0 },
+		{ 2.0 / 3.0, 1.0 / 3.0, 0.0 },
+		{ 1.0 / 3.0, 2.0 / 3.0, 0 },
+		{ 0.0, 1.0, 0.0 },
+		{ 0.0, 0.0, 1.0 }
+	};
 	weightOptions = new double*[5];
 	for (int i = 0; i < 5; i++) {
 		weightOptions[i] = new double[3];
 		for (int j = 0; j < 3; j++) {
 			weightOptions[i][j] = temp[i][j];
-			;		}
+			;
+		}
 	}
 }
 
@@ -68,7 +69,7 @@ double ACO::isIn(int i, int j, vector<Oligo*> result) {
 		}
 	}
 	else if (i != 0 && j == 0) {
-		if (result[result.size()-1]->val == g->origSeq->oligos[i]->val) {
+		if (result[result.size() - 1]->val == g->origSeq->oligos[i]->val) {
 			return 1.0;
 		}
 	}
