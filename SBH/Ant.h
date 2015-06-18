@@ -5,7 +5,6 @@
 
 class Oligo;
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
@@ -13,6 +12,7 @@ class Ant {
 public:
 	vector<Oligo*> conctructSolution();
 	double **pheromons;
+	int currentOverlap;
 	vector<Oligo*> solution;
 	Ant(int size);
 };

@@ -20,6 +20,12 @@ void ACO::initWeightOptions() {
 	}
 }
 
+void ACO::initIndexMap() {
+	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
+		indexes[g->origSeq->oligos[i]->val] = i;
+	}
+}
+
 ACO::ACO(Sequence *seq) {
 	this->g = new Graph(seq);
 	converganceFactor = 0.0;
@@ -27,6 +33,7 @@ ACO::ACO(Sequence *seq) {
 	weightOfBestIterationResult = 1.0;
 	weightOfBestRestartResult = 0.0;
 	bsUpdate = false;
+	initIndexMap();
 	pheromons = new double*[g->origSeq->oligos.size()];
 	for (int i = 0; i < NUMBER_OF_ANTS; i++) {
 		ants.push_back(new Ant(g->origSeq->oligos.size()));
@@ -34,7 +41,7 @@ ACO::ACO(Sequence *seq) {
 	initWeightOptions();
 }
 
-ACO::ACO(Sequence* seq, double learningRate, double numberOfAnts, double initialPheromoneValue) :ACO(seq){
+ACO::ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue) :ACO(seq){
 	this->learningRate = learningRate;
 	this->numberOfAnts = numberOfAnts;
 	this->initialPheromoneValue = initialPheromoneValue;
@@ -43,8 +50,11 @@ ACO::ACO(Sequence* seq, double learningRate, double numberOfAnts, double initial
 void ACO::initPheromoneValues() {
 	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
 		pheromons[i] = new double[g->origSeq->oligos.size()];
-		for (int j = 0; i < g->origSeq->oligos.size(); i++)
-			pheromons[i][j] = initialPheromoneValue;
+		for (int j = 0; i < g->origSeq->oligos.size(); i++) {
+			if (g->origSeq->adjacencyMatrix[i][j] > 0) {
+				pheromons[i][j] = initialPheromoneValue;
+			}
+		}
 	}
 }
 
@@ -154,30 +164,21 @@ double Determinant(double **a, int n)
 			}
 			det += pow(-1.0, 1.0 + j1 + 1.0) * a[0][j1] * Determinant(m, n - 1);
 			for (i = 0; i < n - 1; i++)
-				free(m[i]);
-			free(m);
+				delete m[i];
+			delete m;
 		}
 	}
 	return(det);
 }
 
 void ACO::getBestIterationResult(vector<Ant*> ants) {
-	vector<Oligo *> temp;
-	double rate = 0.0;
+	vector<Oligo *> temp = ants[0]->solution;
 	for (Ant * ant : ants) {
-		int tempRate = getRate(ant->solution);
-		if (tempRate > rate) {
+		if (compareSolutions(temp, ant->solution) == 1) {
 			temp = ant->solution;
-			rate = tempRate;
 		}
 	}
-	if (rate > 0.0) {
-		bestIterationResult = temp;
-	}
-}
-
-double ACO::getRate(vector<Oligo*> solution) {
-	return 0;
+	bestIterationResult = temp;
 }
 
 void ACO::updateWeights() {
@@ -207,6 +208,35 @@ void ACO::updateWeights() {
 
 }
 
+// Returns 1 if vec1 > vec2
+// Returns 0 if vec1 == vec2
+// Returns -1 if vec1 < vec2
+int ACO::compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2) {
+	if (vec1.size() > vec2.size()) {
+		return 1;
+	}
+	else if (vec1.size() == vec2.size()) {
+		int overlapVec1 = 0;
+		int overlapVec2 = 0;
+		for (int i = 0; i < vec1.size() - 2; i++) {
+			overlapVec1 += g->origSeq->adjacencyMatrix[indexes[vec1[i]->val]][indexes[vec1[i + 1]->val]];
+			overlapVec2 += g->origSeq->adjacencyMatrix[indexes[vec2[i]->val]][indexes[vec2[i + 1]->val]];
+		}
+		if (vec1.size()*g->origSeq->oligoLength - overlapVec1 < vec2.size()*g->origSeq->oligoLength - overlapVec2) {
+			return 1;
+		}
+		else if (vec1.size()*g->origSeq->oligoLength - overlapVec1 == vec2.size()*g->origSeq->oligoLength - overlapVec2) {
+			return 0;
+		}
+		else {
+			return -1;
+		}
+		
+	} else {
+		return -1;
+	}
+}
+
 void ACO::resetPheromoneValues() {
 	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
 		for (int j = 0; i < g->origSeq->oligos.size(); i++)
@@ -221,10 +251,10 @@ vector<Oligo *> ACO::getSequence() {
 		for (Ant *ant : ants)
 			iterationSolutions.push_back(ant->conctructSolution());
 		getBestIterationResult(ants);
-		if (bestRestartResult.empty() || getRate(bestIterationResult) > getRate(bestRestartResult)) {
+		if (bestRestartResult.empty() || (compareSolutions(bestIterationResult, bestRestartResult) == 1)) {
 			bestRestartResult = bestIterationResult;
 		}
-		if (bestSoFarResult.empty() || getRate(bestIterationResult) > getRate(bestSoFarResult)) {
+		if (bestSoFarResult.empty() || (compareSolutions(bestIterationResult, bestSoFarResult) == 1)) {
 			bestSoFarResult = bestIterationResult;
 		}
 		pheromonesUpdate();
