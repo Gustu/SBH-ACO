@@ -15,7 +15,7 @@ public:
 	
 	double initialPheromoneValue;
 	
-	ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue);
+	ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue, int numberOfIterations);
 	
 	vector<Oligo *> getSequence();
 
@@ -25,15 +25,17 @@ private:
 	vector<Oligo *> bestRestartResult;
 	double **pheromons;
 	int numberOfAnts;
+	int numberOfIterations;
 	double learningRate;
 	double converganceFactor; //  a measure of how far the algorithm is from convergence
 	bool bsUpdate; //it becomes true when the algorithm reaches convergence
 	vector<Ant*> ants;
 	Graph *g;
+	int iteration;
 	double **weightOptions;
 	void initWeightOptions();
 	void initIndexMap();
-	ACO(Sequence *seq);
+	ACO(Sequence *seq);	
 	void initPheromoneValues(); // initializes pheromons matrix with initial value
 	bool satisfiedConditions(); // decides if algorithm can stop
 	double isIn(int i, int j, vector<Oligo*> result); // decides if oligo is in solution

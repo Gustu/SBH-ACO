@@ -28,6 +28,7 @@ void ACO::initIndexMap() {
 
 ACO::ACO(Sequence *seq) {
 	this->g = new Graph(seq);
+	iteration = 0;
 	converganceFactor = 0.0;
 	weightOfBestSoFarResult = 0.0;
 	weightOfBestIterationResult = 1.0;
@@ -41,10 +42,11 @@ ACO::ACO(Sequence *seq) {
 	initWeightOptions();
 }
 
-ACO::ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue) :ACO(seq){
+ACO::ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue, int numberOfIterations) :ACO(seq){
 	this->learningRate = learningRate;
 	this->numberOfAnts = numberOfAnts;
 	this->initialPheromoneValue = initialPheromoneValue;
+	this->numberOfIterations = numberOfIterations;
 }
 
 void ACO::initPheromoneValues() {
@@ -59,7 +61,12 @@ void ACO::initPheromoneValues() {
 }
 
 bool ACO::satisfiedConditions() {
-	return false;
+	if (iteration++ < numberOfIterations) {
+		return false;
+	}
+	else {
+		return true;
+	}
 }
 
 double ACO::isIn(int i, int j, vector<Oligo*> result) {
@@ -214,24 +221,21 @@ void ACO::updateWeights() {
 int ACO::compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2) {
 	if (vec1.size() > vec2.size()) {
 		return 1;
-	}
-	else if (vec1.size() == vec2.size()) {
+	} else if (vec1.size() == vec2.size()) {
 		int overlapVec1 = 0;
 		int overlapVec2 = 0;
 		for (int i = 0; i < vec1.size() - 2; i++) {
 			overlapVec1 += g->origSeq->adjacencyMatrix[indexes[vec1[i]->val]][indexes[vec1[i + 1]->val]];
 			overlapVec2 += g->origSeq->adjacencyMatrix[indexes[vec2[i]->val]][indexes[vec2[i + 1]->val]];
 		}
-		if (vec1.size()*g->origSeq->oligoLength - overlapVec1 < vec2.size()*g->origSeq->oligoLength - overlapVec2) {
+		if (vec1.size() * g->origSeq->oligoLength - overlapVec1 < vec2.size() * g->origSeq->oligoLength - overlapVec2) {
 			return 1;
-		}
-		else if (vec1.size()*g->origSeq->oligoLength - overlapVec1 == vec2.size()*g->origSeq->oligoLength - overlapVec2) {
+		} else if (vec1.size() * g->origSeq->oligoLength - overlapVec1 == vec2.size() * g->origSeq->oligoLength - overlapVec2) {
 			return 0;
-		}
-		else {
+		} else {
 			return -1;
 		}
-		
+
 	} else {
 		return -1;
 	}
