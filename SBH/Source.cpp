@@ -1,15 +1,22 @@
 #include "Source.h"
+#include "ACO.h"
 
 int main()
 {
 	//CATGTTTCCACTTACAGATCCTTCAAAAAGAGTGTTTCAAAACTGCTCTATGAAAAGGAATGTTCAACTCTGTGAGTTAAATAAAAGCATCAAAAAAAAGTTTCTGAGAATGCTTCTGTC
-	Sequence *seq = new Sequence("CATGTTTCCACTTACAGATCCTTCAAAAAGAGTGTTT", 8);
+	Sequence *seq = new Sequence("CATGTTTCCACTTACAGATCCTTCAAAAAGAGTGTTTCAAAACTGCTCTATGAAAAGGAATGTTCAACTCTGTGAGTTAAATAAAAGCATCAAAAAAAAGTTTCTGAGAATGCTTCTGTC", 3);
 
 	Graph *g = new Graph(seq);
 
-	g->startSearching();
+	//g->startSearching();
 
-	g->printPossibbleSequences();
+	//g->printPossibbleSequences();
+
+	ACO *aco = new ACO(seq, 0.3, 30, 0.5, 2);
+
+	aco->getSolution2();
+
+	aco->printSequence();
 	
 	system("pause");
 }

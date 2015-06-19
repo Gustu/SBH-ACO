@@ -32,7 +32,7 @@ Roulette::Roulette(vector<double> temp, int size) {
 
 int Roulette::spin() {
 	int r = rand() % 10000;
-	double random = (float)(r) / 10000;
+	double random = static_cast<double>(r) / 10000;
 	random *= total;
 	int a = 0;
 	int b = size;
