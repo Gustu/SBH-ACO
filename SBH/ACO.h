@@ -7,8 +7,6 @@
 * PDF z opisem algorytmu http://www.researchgate.net/publication/222836939_An_ant_colony_optimization_algorithm_for_DNA_sequencing_by_hybridization
 */
 
-#define NUMBER_OF_ANTS 20
-
 
 class ACO {
 public:
@@ -37,19 +35,18 @@ private:
 	double **weightOptions;
 	void initWeightOptions();
 	void initIndexMap();
-	ACO(Sequence *seq);	
 	void initPheromoneValues(); // initializes pheromons matrix with initial value
 	bool satisfiedConditions(); // decides if algorithm can stop
 	double isIn(int i, int j, vector<Oligo*> result); // decides if oligo is in solution
 	double getWeightRate(int i, int j); // gets weight proportional rate
 	void lu(double** A, int n);
 	void pheromonesUpdate();
-	void lu(double** pheromons, double** p, double** u, int size);
+	void vaporize();
+	void pheromonesUpdate2();
 	double Determinant2(double** pheromons, int size);
 	// updates pheromons matrix
 	double computeConverganceFactor();
 	void resetPheromoneValues();
-	void getBestIterationResult(vector<vector<Oligo*>> iterationSolutions);
 	void updateWeights();
 	int compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2); // 1 vec1 > vec2, 0 vec1 == vec2, -1 vec1 < vec2
 	// updates solution weights if convergance factor has changed interval

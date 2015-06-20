@@ -2,9 +2,6 @@
 #include <iostream>
 #include <string>
 
-double Determinant(double **a, int n);
-
-
 void ACO::initWeightOptions() {
 	double temp[5][3] = {
 		{ 1, 0, 0 },
@@ -29,22 +26,6 @@ void ACO::initIndexMap() {
 	}
 }
 
-ACO::ACO(Sequence *seq) {
-	this->g = new Graph(seq);
-	iteration = 0;
-	converganceFactor = 0.0;
-	weightOfBestSoFarResult = 0.0;
-	weightOfBestIterationResult = 1.0;
-	weightOfBestRestartResult = 0.0;
-	bsUpdate = false;
-	initIndexMap();
-	pheromons = new double*[g->origSeq->oligos.size()];
-	for (int i = 0; i < NUMBER_OF_ANTS; i++) {
-		ants.push_back(new Ant(g->origSeq->oligos.size(), g->origSeq->adjacencyMatrix, initialPheromoneValue));
-	}
-	initWeightOptions();
-}
-
 ACO::ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue, int numberOfIterations){
 	this->learningRate = learningRate;
 	this->numberOfAnts = numberOfAnts;
@@ -67,12 +48,14 @@ ACO::ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPhe
 }
 
 void ACO::printPheromons() {
+	cout << "####" << endl;
 	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
 		for (int j = 0; j < g->origSeq->oligos.size(); j++) {
-			cout << pheromons[i][j] << " ";
+			cout << pheromons[i][j] << "\t";
 		}
 		cout << endl;
 	}
+	cout << "####" << endl;
 }
 
 void ACO::initPheromoneValues() {
@@ -81,6 +64,9 @@ void ACO::initPheromoneValues() {
 		for (int j = 0; j < g->origSeq->oligos.size(); j++) {
 			if (g->origSeq->adjacencyMatrix[i][j] > 0) {
 				pheromons[i][j] = initialPheromoneValue;
+			}
+			else {
+				pheromons[i][j] = 0.0;
 			}
 		}
 	}
@@ -146,7 +132,7 @@ void ACO::pheromonesUpdate() {
 	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
 		for (int j = 0; j < g->origSeq->oligos.size(); j++) {
 			pheromons[i][j] += learningRate*(getWeightRate(i, j) - pheromons[i][j]);
-			if (pheromons[i][j] < 0.01) {
+			if (pheromons[i][j] > 0 && pheromons[i][j] < 0.01) {
 				pheromons[i][j] = 0.01;
 			}
 			else if (pheromons[i][j] > 0.99) {
@@ -157,7 +143,7 @@ void ACO::pheromonesUpdate() {
 }
 
 double ACO::Determinant2(double** pheromons, int size) {
-	double **l, **u;
+	double **u;
 	u = new double*[size];
 	for (int i = 0; i < size; i++) {
 		u[i] = new double[size];
@@ -188,10 +174,8 @@ double ACO::computeConverganceFactor() {
 	}
 
 	double sum = 0.0;
-	double sum2 = 0.0;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			sum2 += pheromons[i][j];
 			if (tau_max - pheromons[i][j] > pheromons[i][j] - tau_min)
 				sum += tau_max - pheromons[i][j];
 			else
@@ -200,52 +184,13 @@ double ACO::computeConverganceFactor() {
 	}
 
 
-	//double determinant = Determinant2(pheromons, size);
-	return 2 * (sum / (sum2*(tau_max - tau_min)) - 0.5);
+	double determinant = Determinant2(pheromons, size);
+	return 2 * (sum / (determinant*(tau_max - tau_min)) - 0.5);
 }
 
 double Deteminant2(double **pheromons, int size);
 
 void lu(double **a, double **l, double **u, int n);
-
-double Determinant(double **a, int n)
-{
-	int i, j, j1, j2;
-	double det = 0;
-	double **m;
-
-	if (n < 1) { /* Error */
-
-	}
-	else if (n == 1) { /* Shouldn't get used */
-		det = a[0][0];
-	}
-	else if (n == 2) {
-		det = a[0][0] * a[1][1] - a[1][0] * a[0][1];
-	}
-	else {
-		det = 0;
-		for (j1 = 0; j1 < n; j1++) {
-			m = new double*[n - 1];
-			for (i = 0; i < n - 1; i++)
-				m[i] = new double[n - 1];
-			for (i = 1; i < n; i++) {
-				j2 = 0;
-				for (j = 0; j < n; j++) {
-					if (j == j1)
-						continue;
-					m[i - 1][j2] = a[i][j];
-					j2++;
-				}
-			}
-			det += pow(-1.0, 1.0 + j1 + 1.0) * a[0][j1] * Determinant(m, n - 1);
-			for (i = 0; i < n - 1; i++)
-				delete m[i];
-			delete m;
-		}
-	}
-	return(det + DBL_EPSILON);
-}
 
 void ACO::getBestIterationResult(vector<Ant*> ants) {
 	vector<Oligo *> temp = ants[0]->solution;
@@ -366,27 +311,14 @@ vector<Oligo *> ACO::getSolution2() {
 		if (bestSoFarResult.empty() || (compareSolutions(bestIterationResult, bestSoFarResult) == 1)) {
 			bestSoFarResult = bestIterationResult;
 		}
+		//printPheromons();
 		pheromonesUpdate();
 		//printPheromons();
-		//converganceFactor = computeConverganceFactor();
-		//updateWeights();
-		/*if (converganceFactor > 0.9999) {
-			if (bsUpdate) {
-			resetPheromoneValues();
-			bestRestartResult.clear();
-			bsUpdate = false;
-			}
-			else {
-			bsUpdate = true;
-			}
-			}*/
 	}
 	return bestSoFarResult;
 }
 
 void ACO::printSequence() {
-	int c = 0;
-
 
 	string sSeq = bestSoFarResult[0]->val; // Clean sequence from *seq ex. ACGTTTTT
 	for each (Oligo * oligo in bestSoFarResult)
@@ -408,7 +340,8 @@ void ACO::printSequence() {
 		}
 	}
 	cout << "#####" << endl;
-	cout << same << "/" << sSeq.size() << "[" << (int)((same * 100) / sSeq.size()) << "%]\t" << endl;
+	cout << "seq length: " << sSeq.size() << endl;
+	cout << same << "/" << g->origSeq->seq.size() << "[" << (int)((same * 100) / g->origSeq->seq.size()) << "%]\t" << endl;
 	cout << sSeq << endl;
 	cout << "#####" << endl;
 

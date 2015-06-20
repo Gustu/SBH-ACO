@@ -21,36 +21,40 @@ void Ant::generateSpectrum(Graph* g) {
 	}
 }
 
-void Ant::cleanSpeactrum(Oligo* oligo) {
+void Ant::cleanSpeactrum(Oligo* oligo, map<string, int> indexes, int size) {
 	if (spectrum[oligo->val].counter >(spectrum[oligo->val].max + 1)) {
 		spectrum.erase(spectrum.find(oligo->val));
+		// @DOWN USUWANIE KANDYDATOW, KTORZY JUZ OSIAGNELI MAKSA WG. KLASOWOSCI
+		for (int i = 0; i < size; i++)
+			pheromons[i][indexes[oligo->val]] = 0.0;
 	}
 }
 
 vector<Oligo*> Ant::conctructSolution(Graph *g, map<string, int> indexes) {
 	reset();
 	Oligo *next = g->first->oligo;
-	generateSpectrum(g);
+	generateSpectrum(g); // generuje spektrum mozliwych oligo do wyboru
 	solution.push_back(next);
 	spectrum[next->val].counter++;
 	int oligoLength = g->origSeq->oligoLength;
 	int desiredLength = g->origSeq->seq.size();
 	while (oligoLength*solution.size() - currentOverlap < desiredLength) {
-		cleanSpeactrum(next);
-		int before = indexes[next->val];
+		cleanSpeactrum(next, indexes, g->origSeq->oligos.size()); // usuwamy ze spektrum to co zwiekszylo klasowosc o 2
+		int beforeIndex = indexes[next->val];
 		next = chooseNext(next, indexes, g->origSeq->oligos);
-		currentOverlap += adjacencyMatrix[before][indexes[next->val]];
+		spectrum[next->val].counter++;
+		currentOverlap += adjacencyMatrix[beforeIndex][indexes[next->val]];
 		solution.push_back(next);
 	}
-	cutSolution(oligoLength, desiredLength);
+	cutSolution(oligoLength, desiredLength); // skracamy rozwiazanie o 1 oligo, jesli jest za dlugie
+	//updatePheromons(g, currentOverlap, indexes);
 	return solution;
 }
 
 Oligo * Ant::chooseNext(Oligo *oligo, map<string, int> indexes, vector<Oligo *> &oligos) {
-	vector<int> candidates;
-	vector<double> pheromonList;
+	vector<int> candidates; // lista indeksow do kandydatow
+	vector<double> pheromonList; // lista kandydatow
 	int index = indexes[oligo->val];
-	map<string, int>::iterator it;
 	for (int i = 0; i < size; i++) {
 		if (index != i && pheromons[index][i]>0) {
 			candidates.push_back(i);
@@ -58,8 +62,16 @@ Oligo * Ant::chooseNext(Oligo *oligo, map<string, int> indexes, vector<Oligo *> 
 		}
 	}
 	Roulette *roulette = new Roulette(pheromonList, pheromonList.size());
-	int nr = roulette->spin();
+	int nr = roulette->spin(); // losujemy na podstawie listy feromonow
 	return oligos[candidates[nr]];
+}
+
+void Ant::updatePheromons(Graph *g, int overlap, map<string, int> indexes) {
+	int length = solution.size()*g->origSeq->oligoLength - overlap;
+	double pheromonValue = static_cast<double>(length) / g->origSeq->seq.size();
+	for (int i = 0; i < solution.size() - 1; i++) {
+		pheromonsToAdd[indexes[solution[i]->val]][indexes[solution[i + 1]->val]] = pheromonValue;
+	}
 }
 
 Ant::Ant(int size, int **adjacenecyMatrix, double initialPheromoneValue) {
@@ -67,9 +79,12 @@ Ant::Ant(int size, int **adjacenecyMatrix, double initialPheromoneValue) {
 	this->adjacencyMatrix = adjacenecyMatrix;
 	this->size = size;
 	pheromons = new double*[size];
+	pheromonsToAdd = new double*[size];
 	for (int i = 0; i < size; i++) {
 		pheromons[i] = new double[size];
+		pheromonsToAdd[i] = new double[size];
 		for (int j = 0; j< size; j++) {
+			pheromonsToAdd[i][j] = 0.0;
 			if (adjacencyMatrix[i][j] > 0) {
 				pheromons[i][j] = initialPheromoneValue;
 			}
@@ -85,6 +100,9 @@ void Ant::reset() {
 		for (int j = 0; j < size; j++) {
 			if (adjacencyMatrix[i][j] > 0) {
 				pheromons[i][j] = initialPheromoneValue;
+			}
+			else {
+				pheromons[i][j] = 0.0;
 			}
 		}
 	}

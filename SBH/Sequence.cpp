@@ -31,7 +31,7 @@ void Sequence::adjacent() {
 		for (int j = 0; j < size; j++)
 		{
 			if (i == j) {
-				adjacencyMatrix[i][j] = oligoLength;
+				adjacencyMatrix[i][j] = 0;
 			}
 			else {
 				for (int k = 0; k < oligoLength - 1; k++)
@@ -144,11 +144,11 @@ int ** Sequence::initAdjacencyMatrix(int size) {
 }
 
 void Sequence::printAdjacenyMatrix(){
-	for (int i = 0; i < seq.length() - oligoLength + 1; i++)
+	for (int i = 0; i < oligos.size(); i++)
 	{
-		for (int j = 0; j < seq.length() - oligoLength + 1; j++)
+		for (int j = 0; j < oligos.size(); j++)
 		{
-			cout << adjacencyMatrix[i][j] << " ";
+			cout << adjacencyMatrix[i][j] << "\t";
 		}
 		cout << endl;
 	}
