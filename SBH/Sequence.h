@@ -31,7 +31,7 @@ public:
 	void randomizeOligosSequence();
 
 	void addErrors(double pos, double neg);
-
+	Sequence(string seq, int oligoLength, double neg, double pos);
 	void printAdjacenyMatrix();
 
 	void printOligos();

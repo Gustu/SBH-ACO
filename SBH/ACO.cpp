@@ -37,6 +37,8 @@ ACO::ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPhe
 	weightOfBestSoFarResult = 0.0;
 	weightOfBestIterationResult = 1.0;
 	weightOfBestRestartResult = 0.0;
+	bestOverlap = 1;
+	iterationOverlap = 0;
 	bsUpdate = false;
 	initIndexMap();
 	pheromons = new double*[g->origSeq->oligos.size()];
@@ -102,13 +104,17 @@ void ACO::pheromonesUpdate() {
 
 
 void ACO::getBestIterationResult() {
-	vector<Oligo *> temp = ants[0]->solution;
+	iterationOverlap = 0;
+	bestIterationResult.clear();
+	bestIterationResult = ants[0]->solution;
 	for (Ant * ant : ants) {
-		if (compareSolutions(temp, ant->solution) == 1) {
-			temp = ant->solution;
+		int compare = compareSolutions(bestIterationResult, ant->solution);
+		if (compare > 0) {
+			iterationOverlap = compare;
+			cout << iterationOverlap << endl;
+			bestIterationResult = ant->solution;
 		}
 	}
-	bestIterationResult = temp;
 }
 
 
@@ -116,7 +122,7 @@ void ACO::getBestIterationResult() {
 // Returns 0 if vec1 == vec2
 // Returns -1 if vec1 < vec2
 int ACO::compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2) {
-
+	
 	int overlapVec1 = 0;
 	int overlapVec2 = 0;
 	for (int i = 0; i < vec1.size() - 1; i++) {
@@ -126,15 +132,19 @@ int ACO::compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2) {
 	for (int i = 0; i < vec2.size() - 1; i++) {
 		overlapVec2 += g->origSeq->adjacencyMatrix[indexes[vec2[i]->val]][indexes[vec2[i + 1]->val]];
 	}
-	
+	if (bestOverlap < overlapVec1) {
+		bestOverlap = overlapVec1;
+		bestOverlapResult = vec1;
+	}
+
 	if (vec1.size() * g->origSeq->oligoLength - overlapVec1 < vec2.size() * g->origSeq->oligoLength - overlapVec2) {
-		return 1;
+		return overlapVec1;
 	}
 	else if (vec1.size() * g->origSeq->oligoLength - overlapVec1 == vec2.size() * g->origSeq->oligoLength - overlapVec2) {
 		return 0;
 	}
 	else {
-		return -1;
+		return -overlapVec1;
 	}
 
 
@@ -154,7 +164,7 @@ vector<Oligo *> ACO::getSolution() {
 	//printPheromons();
 	while (!satisfiedConditions()) {
 		for (Ant *ant : ants) {
-			ant->conctructSolution(g);
+			ant->conctructSolution(g, bestOverlap);
 		}
 		getBestIterationResult();
 		pheromonesUpdate();
@@ -164,7 +174,6 @@ vector<Oligo *> ACO::getSolution() {
 }
 
 void ACO::printSequence() {
-
 	string sSeq = bestIterationResult[0]->val; // Clean sequence from *seq ex. ACGTTTTT
 	for each (Oligo * oligo in bestIterationResult)
 	{
@@ -174,20 +183,46 @@ void ACO::printSequence() {
 		}
 		if (i > 0 && i < oligo->val.size()) {
 			sSeq += oligo->val.substr(oligo->val.size() - i, oligo->val.size());
+			cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
+		}
+	}
+	cout << endl;
+	string sSeq2 = bestOverlapResult[0]->val; // Clean sequence from *seq ex. ACGTTTTT
+	for each (Oligo * oligo in bestOverlapResult)
+	{
+		int i = 0;
+		while (sSeq2.substr(sSeq2.size() - oligo->val.size() + i, sSeq2.size()) != oligo->val.substr(0, oligo->val.size() - i) && i<oligo->val.size()) {
+			i++;
+		}
+		if (i > 0 && i < oligo->val.size()) {
+			sSeq2 += oligo->val.substr(oligo->val.size() - i, oligo->val.size());
 			//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
 		}
 	}
 
 	int same = 0;
+	int same2 = 0;
 	for (int i = 0; i < sSeq.size(); i++){
 		if (sSeq[i] == g->origSeq->seq[i]){
 			same++;
 		}
 	}
+	for (int i = 0; i < sSeq2.size(); i++){
+		if (sSeq2[i] == g->origSeq->seq[i]){
+			same2++;
+		}
+	}
 	cout << "#####" << endl;
+	cout << "Iteration overlap: " << iterationOverlap << endl;
+	cout << "Oligo used: " << bestIterationResult.size() << endl;	
 	cout << "seq length: " << sSeq.size() << endl;
-	cout << same << "/" << g->origSeq->seq.size() << "[" << (int)((same * 100) / g->origSeq->seq.size()) << "%]\t" << endl;
+	cout << same << "/" << g->origSeq->seq.size() << "[" << static_cast<int>((same * 100) / g->origSeq->seq.size()) << "%]\t" << endl;
 	cout << sSeq << endl;
 	cout << "#####" << endl;
-
+	cout << "Best overlap: " << bestOverlap << endl;
+	cout << "Oligo used: " << bestOverlapResult.size() << endl;
+	cout << "seq length: " << sSeq2.size() << endl;
+	cout << same2 << "/" << g->origSeq->seq.size() << "[" << static_cast<int>((same2 * 100) / g->origSeq->seq.size()) << "%]\t" << endl;
+	cout << sSeq2 << endl;
+	cout << "#####" << endl;
 }

@@ -17,8 +17,23 @@ int Ant::cutSolution(int oligoLength, int desiredLength) {
 void Ant::generateSpectrum(Graph* g) {
 	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
 		Bounds bound;
-		bound.max = g->origSeq->oligos[i]->oligoClass->baseOligoClass + 1;
-		bound.min = g->origSeq->oligos[i]->oligoClass->baseOligoClass - 1;
+		int oligoClass = g->origSeq->oligos[i]->oligoClass->baseOligoClass;
+		if (oligoClass == 0) {
+			bound.max = 0;
+			bound.min = 0;
+		}
+		else if (oligoClass == 1) {
+			bound.max = 2;
+			bound.min = 1;
+		}
+		else if (oligoClass == 2) {
+			bound.max = 4;
+			bound.min = 3;
+		}
+		else {
+			bound.min = 5;
+			bound.max = 0xFFFFFF;
+		}
 		bound.counter = 0;
 		spectrum[g->origSeq->oligos[i]->val] = bound;
 	}
@@ -33,7 +48,7 @@ int Ant::findIndexOfFirstOligo(Graph* g, Oligo* next) {
 	return -1;
 }
 
-void Ant::conctructSolution(Graph *g) {
+void Ant::conctructSolution(Graph *g, int bestOverlap) {
 	reset();
 	generateSpectrum(g);
 	Oligo *next = g->first->oligo;
@@ -49,7 +64,7 @@ void Ant::conctructSolution(Graph *g) {
 
 	while (oligoLength*solution.size() - currentOverlap < desiredLength) {
 		before = index;
-		index = chooseNext(index, g->origSeq->oligos.size());		
+		index = chooseNext(index, g->origSeq->oligos.size());
 		solution.push_back(g->origSeq->oligos[index]);
 		currentOverlap += g->origSeq->adjacencyMatrix[before][index];
 		if (oligoLength*solution.size() - currentOverlap <= desiredLength)
@@ -59,7 +74,8 @@ void Ant::conctructSolution(Graph *g) {
 		}
 	}
 	int length = cutSolution(oligoLength, desiredLength);
-	rateSolution(g->origSeq->oligos.size(), length, desiredLength, g);
+	//cout << currentOverlap << endl;
+	rateSolution(g->origSeq->oligos.size(), length, desiredLength, g, static_cast<double>(currentOverlap)/bestOverlap);
 }
 
 int Ant::chooseNext(int index, int size) {
@@ -109,25 +125,34 @@ double Ant::getErrorRatio(Graph *g) {
 	for (int i = 0; i < solution.size() - 1; i++) {
 		Edge *edge = new Edge(new Node(solution[i]), new Node(solution[i + 1]));
 		edge->getBetweenOligos(g->origSeq->oligoLength);
-		spectrum[solution[i+1]->val].counter++;
+		spectrum[solution[i + 1]->val].counter++;
 		for (Oligo *oligo : edge->oligos) {
 			spectrum[solution[i]->val].counter++;
 		}
 	}
 	int counter = 0;
 	for (map<string, Bounds>::iterator it = spectrum.begin(); it != spectrum.end(); ++it) {
-		if ((*it).second.counter >(*it).second.max || (*it).second.counter < (*it).second.min) {
-			counter++;
+		int over = (*it).second.counter - (*it).second.max;
+		int below = (*it).second.min - (*it).second.counter;
+		if (over > 0) {
+			counter += over;
+		}
+		if (below > 0) {
+			counter += below;
 		}
 	}
 
-	return 1.0/counter;
+	return 1.0 / counter;
 }
 
-void Ant::rateSolution(int size, int length, int desiredLength, Graph *g) {
-	double rate = static_cast<double>(length)/desiredLength;
+void Ant::rateSolution(int size, int length, int desiredLength, Graph *g, double overlapRatio) {
+	double rate;
+	if (overlapRatio > 1) {
+		rate = initialPheromoneValue;
+	}
+	else rate = initialPheromoneValue * overlapRatio;
 	double errorRatio = getErrorRatio(g);
-	rate *= errorRatio;
+	rate *= (1 - errorRatio);
 	multiplePheromons(size, rate);
 }
 

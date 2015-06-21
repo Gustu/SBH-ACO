@@ -54,7 +54,7 @@ void Sequence::randomizeOligosSequence() {
 void Sequence::addErrors(double pos, double neg)
 {
 	if (pos == 0 && neg == 0) return;
-	srand(time(NULL));
+	
 	int length = oligos.size();
 	if (length > RAND_MAX){
 		cout << "W001: Length higher than RAND_MAX. Errors might be less random." << endl;
@@ -102,7 +102,7 @@ void Sequence::addErrors(double pos, double neg)
 	}
 }
 
-Sequence::Sequence(string seq, int oligoLength) {
+Sequence::Sequence(string seq, int oligoLength, double neg, double pos) {
 	this->seq = seq;
 	this->oligoLength = oligoLength;
 	int oligoNumber = (seq.length() - oligoLength + 1);
@@ -116,7 +116,7 @@ Sequence::Sequence(string seq, int oligoLength) {
 	
 	oligoFromSequence();
 	randomizeOligosSequence();
-	addErrors(0.2, 0.2);
+	addErrors(pos, neg);
 	this->adjacencyMatrix = initAdjacencyMatrix(seq.length() - oligoLength + 1 + errorOligos);
 	adjacent();
 }

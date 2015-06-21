@@ -18,8 +18,11 @@ public:
 	void printPheromons();
 	vector<Oligo*> getSolution();
 	void printSequence();
+	int bestOverlap;
+	int iterationOverlap;
 private:
 	vector<Oligo *> bestSoFarResult;
+	vector<Oligo *> bestOverlapResult;
 	vector<Oligo *> bestIterationResult;
 	vector<Oligo *> bestRestartResult;
 	double **pheromons;
