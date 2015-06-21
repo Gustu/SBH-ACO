@@ -4,6 +4,7 @@
 int main()
 {
 	//CATGTTTCCACTTACAGATCCTTCAAAAAGAGTGTTTCAAAACTGCTCTATGAAAAGGAATGTTCAACTCTGTGAGTTAAATAAAAGCATCAAAAAAAAGTTTCTGAGAATGCTTCTGTC
+	//HIV 240 - actctttggcaacgacccctcgtcacaataaagataggggggcaactaaaggaagctctattagatacaggagcagatgatacagtattagaagaaatgagtttgccaggaagatggaaaccaaaaatgatagggggaattggaggttttatcaaagtaagacagtatgatcagatactcatagaaatctgtggacataaagctataggtacagtattagtaggacctacacctgtcaac
 	Sequence *seq = new Sequence("CATGTTTCCACTTACAGATCCTTCAAAAAGAGTGTTTCAAAACTGCTCTATGAAAAGGAATGTTCAACTCTGTGAGTTAAATAAAAGCATCAAAAAAAAGTTTCTGAGAATGCTTCTGTC", 8);
 
 	Graph *g = new Graph(seq);
@@ -12,9 +13,9 @@ int main()
 
 	//g->printPossibbleSequences();
 
-	ACO *aco = new ACO(seq, 0.7, 20, 0.5, 5);
+	ACO *aco = new ACO(seq, 0.5, 20, 0.5, 20);
 
-	aco->getSolution2();
+	aco->getSolution();
 
 	aco->printSequence();
 	

@@ -16,8 +16,7 @@ public:
 	ACO(Sequence* seq, double learningRate, int numberOfAnts, double initialPheromoneValue, int numberOfIterations);
 
 	void printPheromons();
-	vector<Oligo *> getSolution();
-	vector<Oligo*> getSolution2();
+	vector<Oligo*> getSolution();
 	void printSequence();
 private:
 	vector<Oligo *> bestSoFarResult;
@@ -37,20 +36,16 @@ private:
 	void initIndexMap();
 	void initPheromoneValues(); // initializes pheromons matrix with initial value
 	bool satisfiedConditions(); // decides if algorithm can stop
-	double isIn(int i, int j, vector<Oligo*> result); // decides if oligo is in solution
-	double getWeightRate(int i, int j); // gets weight proportional rate
-	void lu(double** A, int n);
-	void pheromonesUpdate();
 	void vaporize();
-	void pheromonesUpdate2();
-	double Determinant2(double** pheromons, int size);
+	void pheromonesUpdate();
+
 	// updates pheromons matrix
-	double computeConverganceFactor();
+
 	void resetPheromoneValues();
-	void updateWeights();
+
 	int compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2); // 1 vec1 > vec2, 0 vec1 == vec2, -1 vec1 < vec2
 	// updates solution weights if convergance factor has changed interval
-	void getBestIterationResult(vector<Ant*> ants); // maximaizes solution rate
+	void getBestIterationResult(); // maximaizes solution rate
 	friend double Determinant(double** pheromons, int size); // computes matrix determinant
 	double weightOfBestSoFarResult;
 	double weightOfBestIterationResult;
