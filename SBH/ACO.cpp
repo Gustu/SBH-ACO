@@ -87,34 +87,40 @@ void ACO::vaporize() {
 	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
 		for (int j = 0; j < g->origSeq->oligos.size(); j++) {
 			pheromons[i][j] *= 1 - learningRate;
-		}
-	}
-}
-
-void ACO::pheromonesUpdate() {
-	for (Ant *ant : ants) {
-		for (int i = 0; i < g->origSeq->oligos.size(); i++) {
-			for (int j = 0; j < g->origSeq->oligos.size(); j++) {
-				pheromons[i][j] += ant->pheromonsToAdd[i][j];
+			if (pheromons[i][j] > 0 && pheromons[i][j] < 0.01) {
+				pheromons[i][j] = 0.01;
 			}
 		}
 	}
+}
+
+void ACO::pheromonesUpdate(int best) {
 	vaporize();
+	for (int i = 0; i < g->origSeq->oligos.size(); i++) {
+		for (int j = 0; j < g->origSeq->oligos.size(); j++) {
+			pheromons[i][j] += ants[best]->pheromonsToAdd[i][j];
+		}
+	}	
 }
 
 
-void ACO::getBestIterationResult() {
+int ACO::getBestIterationResult() {
 	iterationOverlap = 0;
 	bestIterationResult.clear();
 	bestIterationResult = ants[0]->solution;
+	int best = 0;
+	int counter = 0;
 	for (Ant * ant : ants) {
 		int compare = compareSolutions(bestIterationResult, ant->solution);
 		if (compare > 0) {
+			best = counter;
 			iterationOverlap = compare;
-			cout << iterationOverlap << endl;
+			//cout << iterationOverlap << endl;
 			bestIterationResult = ant->solution;
 		}
+		counter++;
 	}
+	return best;
 }
 
 
@@ -122,12 +128,12 @@ void ACO::getBestIterationResult() {
 // Returns 0 if vec1 == vec2
 // Returns -1 if vec1 < vec2
 int ACO::compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2) {
-	
+
 	int overlapVec1 = 0;
 	int overlapVec2 = 0;
 	for (int i = 0; i < vec1.size() - 1; i++) {
 		overlapVec1 += g->origSeq->adjacencyMatrix[indexes[vec1[i]->val]][indexes[vec1[i + 1]->val]];
-		
+
 	}
 	for (int i = 0; i < vec2.size() - 1; i++) {
 		overlapVec2 += g->origSeq->adjacencyMatrix[indexes[vec2[i]->val]][indexes[vec2[i + 1]->val]];
@@ -138,7 +144,7 @@ int ACO::compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2) {
 	}
 
 	if (vec1.size() * g->origSeq->oligoLength - overlapVec1 < vec2.size() * g->origSeq->oligoLength - overlapVec2) {
-		return overlapVec1;
+		return overlapVec2;
 	}
 	else if (vec1.size() * g->origSeq->oligoLength - overlapVec1 == vec2.size() * g->origSeq->oligoLength - overlapVec2) {
 		return 0;
@@ -166,8 +172,8 @@ vector<Oligo *> ACO::getSolution() {
 		for (Ant *ant : ants) {
 			ant->conctructSolution(g, bestOverlap);
 		}
-		getBestIterationResult();
-		pheromonesUpdate();
+		int best = getBestIterationResult();
+		pheromonesUpdate(best);
 		//printPheromons();
 	}
 	return bestIterationResult;
@@ -183,7 +189,7 @@ void ACO::printSequence() {
 		}
 		if (i > 0 && i < oligo->val.size()) {
 			sSeq += oligo->val.substr(oligo->val.size() - i, oligo->val.size());
-			cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
+			//cout << oligo->val << "." << oligo->oligoClass->oligoClass << "->";
 		}
 	}
 	cout << endl;
@@ -214,7 +220,7 @@ void ACO::printSequence() {
 	}
 	cout << "#####" << endl;
 	cout << "Iteration overlap: " << iterationOverlap << endl;
-	cout << "Oligo used: " << bestIterationResult.size() << endl;	
+	cout << "Oligo used: " << bestIterationResult.size() << endl;
 	cout << "seq length: " << sSeq.size() << endl;
 	cout << same << "/" << g->origSeq->seq.size() << "[" << static_cast<int>((same * 100) / g->origSeq->seq.size()) << "%]\t" << endl;
 	cout << sSeq << endl;

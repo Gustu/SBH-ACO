@@ -20,8 +20,6 @@ public:
 
 	int** initAdjacencyMatrix(int size);
 
-	Sequence(string seq, int oligoLength);
-
 	Sequence(Sequence *seq);
 
 	vector<Oligo*> oligoFromSequence();

@@ -40,6 +40,7 @@ private:
 	void initPheromoneValues(); // initializes pheromons matrix with initial value
 	bool satisfiedConditions(); // decides if algorithm can stop
 	void vaporize();
+	void pheromonesUpdate(int best);
 	void pheromonesUpdate();
 
 	// updates pheromons matrix
@@ -48,7 +49,7 @@ private:
 
 	int compareSolutions(vector<Oligo*> vec1, vector<Oligo*> vec2); // 1 vec1 > vec2, 0 vec1 == vec2, -1 vec1 < vec2
 	// updates solution weights if convergance factor has changed interval
-	void getBestIterationResult(); // maximaizes solution rate
+	int getBestIterationResult(); // maximaizes solution rate
 	friend double Determinant(double** pheromons, int size); // computes matrix determinant
 	double weightOfBestSoFarResult;
 	double weightOfBestIterationResult;

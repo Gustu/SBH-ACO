@@ -145,6 +145,7 @@ void Graph::printPossibbleSequences() {
 		
 	}
 	result.unique();
+	cout << result.size();
 	int num = 0;
 	for (string r : result) {
 		int same = 0;
